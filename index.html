@@ -1,119 +1,87 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Pokédex Avanzada</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <title>Pokédex</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #c00;
+      margin: 0;
+      padding: 0;
+    }
 
-<style>
-body {
-    margin: 0;
-    background: #8b0000;
-    font-family: 'Press Start 2P', cursive;
-    color: white;
-    text-align: center;
-}
+    .pokedex {
+      width: 400px;
+      margin: 20px auto;
+      background: #b00;
+      border-radius: 10px;
+      padding: 10px;
+      color: white;
+    }
 
-#pokedex {
-    width: 900px;
-    margin: 20px auto;
-    background: #c62828;
-    border-radius: 20px;
-    padding: 15px;
-    box-shadow: 0 0 20px black;
-}
+    .pantalla {
+      background: #222;
+      border-radius: 8px;
+      padding: 10px;
+      min-height: 400px;
+      display: none;
+    }
 
-.pantalla {
-    display: none;
-    background: #111;
-    padding: 15px;
-    border-radius: 10px;
-}
+    .pantalla.activa {
+      display: block;
+    }
 
-.activa {
-    display: block;
-}
+    #listaPokemon {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 5px;
+    }
 
-#listaPokemon {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, 120px);
-    gap: 10px;
-    justify-content: center;
-}
+    .pokeItem {
+      background: #333;
+      border-radius: 5px;
+      text-align: center;
+      cursor: pointer;
+      padding: 5px;
+    }
 
-.pokeItem {
-    background: #222;
-    padding: 5px;
-    border-radius: 10px;
-    cursor: pointer;
-}
+    .pokeItem img {
+      width: 64px;
+      height: 64px;
+    }
 
-.pokeItem img {
-    width: 80px;
-}
+    input {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
 
-#detalle img {
-    width: 150px;
-}
-
-.graficas {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-}
-
-canvas {
-    background: #fff;
-    border-radius: 10px;
-    padding: 10px;
-}
-button {
-    font-family: 'Press Start 2P', cursive;
-    padding: 8px;
-    margin: 10px;
-}
-</style>
+    button {
+      padding: 5px 10px;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  </style>
 </head>
-
 <body>
 
-<div id="pokedex">
-    <h1>POKÉDEX</h1>
+<div class="pokedex">
+  <h2>POKÉDEX</h2>
 
-    <!-- PANTALLA 1: LISTA -->
-    <div id="pantallaLista" class="pantalla activa">
-        <input type="text" id="buscador" placeholder="Buscar Pokémon...">
-        <div id="listaPokemon"></div>
-    </div>
+  <div id="pantallaLista" class="pantalla activa">
+    <input type="text" id="buscador" placeholder="Buscar Pokémon...">
+    <div id="listaPokemon"></div>
+  </div>
 
-    <!-- PANTALLA 2: DETALLE -->
-    <div id="pantallaDetalle" class="pantalla">
-        <button onclick="volver()">⬅ VOLVER</button>
-        <h2 id="nombrePokemon"></h2>
-        <img id="imagenPokemon">
-
-        <div class="graficas">
-            <div>
-                <h3>Estadísticas</h3>
-                <canvas id="graficaStats" width="300" height="300"></canvas>
-            </div>
-            <div>
-                <h3>Top 10 Ataques</h3>
-                <canvas id="graficaAtaques" width="400" height="300"></canvas>
-            </div>
-        </div>
-
-        <div id="listaAtaques"></div>
-    </div>
+  <div id="pantallaDetalle" class="pantalla">
+    <h3 id="nombrePokemon"></h3>
+    <img id="imagenPokemon" width="150">
+    <br>
+    <button onclick="volver()">VOLVER</button>
+  </div>
 </div>
 
-<script>
-// Aquí irá toda la lógica (Parte 2, 3 y 4)
-</script>
-
-</body>
-</html>
 <script>
 const pantallaLista = document.getElementById("pantallaLista");
 const pantallaDetalle = document.getElementById("pantallaDetalle");
@@ -124,7 +92,6 @@ const imagenPokemon = document.getElementById("imagenPokemon");
 
 let todos = [];
 
-// Cargar todos los Pokémon (1 a 1010 aprox.)
 async function cargarTodos() {
   const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1010");
   const data = await res.json();
@@ -154,11 +121,8 @@ async function abrirDetalle(id) {
   nombrePokemon.textContent = `#${data.id} ${data.name.toUpperCase()}`;
   imagenPokemon.src = data.sprites.front_default;
 
-  // Cambiar de pantalla
   pantallaLista.classList.remove("activa");
   pantallaDetalle.classList.add("activa");
-
-  // (Las gráficas se llenarán en la PARTE 3 y 4)
 }
 
 function volver() {
@@ -166,15 +130,14 @@ function volver() {
   pantallaLista.classList.add("activa");
 }
 
-// Buscador
 buscador.addEventListener("input", () => {
   const texto = buscador.value.toLowerCase();
   const filtrados = todos.filter(p => p.name.includes(texto));
   mostrarLista(filtrados);
 });
 
-// Iniciar
 cargarTodos();
 </script>
 
-
+</body>
+</html>
