@@ -1,96 +1,93 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Pokédex</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #c00;
-      margin: 0;
-      padding: 0;
-    }
+<meta charset="UTF-8">
+<title>Pokédex</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+body {
+  margin: 0;
+  font-family: Arial;
+  background-size: cover;
+  background-position: center;
+}
 
-    .pokedex {
-      width: 400px;
-      margin: 20px auto;
-      background: #b00;
-      border-radius: 10px;
-      padding: 10px;
-      color: white;
-    }
+.pokedex {
+  width: 420px;
+  margin: 20px auto;
+  background: rgba(200,0,0,0.9);
+  border-radius: 12px;
+  padding: 10px;
+  color: white;
+}
 
-    .pantalla {
-      background: #222;
-      border-radius: 8px;
-      padding: 10px;
-      min-height: 400px;
-      display: none;
-    }
+.pantalla {
+  background: rgba(0,0,0,0.7);
+  border-radius: 10px;
+  padding: 10px;
+  min-height: 450px;
+  display: none;
+}
 
-    .pantalla.activa {
-      display: block;
-    }
+.pantalla.activa { display: block; }
 
-    #listaPokemon {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 5px;
-    }
+#listaPokemon {
+  display: grid;
+  grid-template-columns: repeat(3,1fr);
+  gap: 6px;
+}
 
-    .pokeItem {
-      background: #333;
-      border-radius: 5px;
-      text-align: center;
-      cursor: pointer;
-      padding: 5px;
-    }
+.pokeItem {
+  background: #333;
+  text-align: center;
+  border-radius: 6px;
+  cursor: pointer;
+}
 
-    .pokeItem img {
-      width: 64px;
-      height: 64px;
-    }
+.pokeItem img { width: 72px; }
 
-    input {
-      width: 100%;
-      padding: 5px;
-      margin-bottom: 10px;
-    }
-
-    button {
-      padding: 5px 10px;
-      margin-top: 10px;
-      cursor: pointer;
-    }
-  </style>
+canvas { background: rgba(255,255,255,0.9); border-radius: 8px; }
+</style>
 </head>
+
 <body>
-
 <div class="pokedex">
-  <h2>POKÉDEX</h2>
+<h2>POKÉDEX</h2>
 
-  <div id="pantallaLista" class="pantalla activa">
-    <input type="text" id="buscador" placeholder="Buscar Pokémon...">
-    <div id="listaPokemon"></div>
-  </div>
+<div id="pantallaLista" class="pantalla activa">
+  <input id="buscador" placeholder="Buscar Pokémon...">
+  <div id="listaPokemon"></div>
+</div>
 
-  <div id="pantallaDetalle" class="pantalla">
-    <h3 id="nombrePokemon"></h3>
-    <img id="imagenPokemon" width="150">
-    <br>
-    <button onclick="volver()">VOLVER</button>
-  </div>
+<div id="pantallaDetalle" class="pantalla">
+  <h3 id="nombrePokemon"></h3>
+  <img id="imagenPokemon" width="150">
+  <canvas id="radarStats"></canvas>
+  <button onclick="volver()">VOLVER</button>
+</div>
 </div>
 
 <script>
-const pantallaLista = document.getElementById("pantallaLista");
-const pantallaDetalle = document.getElementById("pantallaDetalle");
 const listaPokemon = document.getElementById("listaPokemon");
 const buscador = document.getElementById("buscador");
+const pantallaLista = document.getElementById("pantallaLista");
+const pantallaDetalle = document.getElementById("pantallaDetalle");
 const nombrePokemon = document.getElementById("nombrePokemon");
 const imagenPokemon = document.getElementById("imagenPokemon");
 
 let todos = [];
+let radar;
+
+const fondos = {
+  fire: "url('https://i.imgur.com/6Z7bJbM.jpg')",
+  water: "url('https://i.imgur.com/GZ9Yw1S.jpg')",
+  grass: "url('https://i.imgur.com/3m8Z4wQ.jpg')",
+  electric: "url('https://i.imgur.com/0q9Z1Zm.jpg')",
+  ice: "url('https://i.imgur.com/7YF3nUj.jpg')",
+  ghost: "url('https://i.imgur.com/xK0gJ3Z.jpg')",
+  dragon: "url('https://i.imgur.com/FnF7c7P.jpg')",
+  default: "url('https://i.imgur.com/9ZQZ4Zb.jpg')"
+};
 
 async function cargarTodos() {
   const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1010");
@@ -104,12 +101,8 @@ function mostrarLista(lista) {
   lista.forEach((p, i) => {
     const div = document.createElement("div");
     div.className = "pokeItem";
-    const id = i + 1;
-    div.innerHTML = `
-      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png">
-      <p>#${id} ${p.name}</p>
-    `;
-    div.onclick = () => abrirDetalle(id);
+    div.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png"><p>${p.name}</p>`;
+    div.onclick = () => abrirDetalle(i+1);
     listaPokemon.appendChild(div);
   });
 }
@@ -118,8 +111,30 @@ async function abrirDetalle(id) {
   const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
   const data = await res.json();
 
-  nombrePokemon.textContent = `#${data.id} ${data.name.toUpperCase()}`;
-  imagenPokemon.src = data.sprites.front_default;
+  nombrePokemon.textContent = data.name.toUpperCase();
+  imagenPokemon.src = data.sprites.other["official-artwork"].front_default;
+
+  const tipo = data.types[0].type.name;
+  document.body.style.backgroundImage = fondos[tipo] || fondos.default;
+
+  const stats = data.stats.map(s => s.base_stat);
+  const etiquetas = ["HP","ATQ","DEF","ATQ ESP","DEF ESP","VEL"];
+
+  if (radar) radar.destroy();
+  radar = new Chart(document.getElementById("radarStats"), {
+    type: "radar",
+    data: {
+      labels: etiquetas,
+      datasets: [{
+        label: "Estadísticas",
+        data: stats,
+        fill: true
+      }]
+    },
+    options: {
+      scales: { r: { beginAtZero: true, max: 200 } }
+    }
+  });
 
   pantallaLista.classList.remove("activa");
   pantallaDetalle.classList.add("activa");
@@ -132,12 +147,11 @@ function volver() {
 
 buscador.addEventListener("input", () => {
   const texto = buscador.value.toLowerCase();
-  const filtrados = todos.filter(p => p.name.includes(texto));
-  mostrarLista(filtrados);
+  mostrarLista(todos.filter(p => p.name.includes(texto)));
 });
 
 cargarTodos();
 </script>
-
 </body>
 </html>
+
