@@ -7,34 +7,39 @@
 <style>
 body {
   margin: 0;
-  font-family: Arial;
-  background-size: cover;
-  background-position: center;
-  image-rendering: pixelated;
+  font-family: Arial, sans-serif;
+  background: #2b2b2b;
+  background-image: url("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/official-artwork/25.png");
+  background-repeat: no-repeat;
+  background-position: right bottom;
+  background-size: 300px;
 }
 
 .pokedex {
   width: 420px;
   margin: 20px auto;
-  background: rgba(180,0,0,0.9);
+  background: #c62828;
   border-radius: 12px;
   padding: 10px;
   color: white;
+  box-shadow: 0 0 15px black;
 }
 
 .pantalla {
-  background: rgba(0,0,0,0.7);
+  background: #111;
   border-radius: 10px;
   padding: 10px;
   min-height: 450px;
   display: none;
 }
 
-.pantalla.activa { display: block; }
+.pantalla.activa {
+  display: block;
+}
 
 #listaPokemon {
   display: grid;
-  grid-template-columns: repeat(3,1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 6px;
 }
 
@@ -46,10 +51,13 @@ body {
   padding: 5px;
 }
 
-.pokeItem img { width: 72px; }
+.pokeItem img {
+  width: 72px;
+  image-rendering: pixelated;
+}
 
 canvas {
-  background: rgba(255,255,255,0.9);
+  background: white;
   border-radius: 8px;
 }
 </style>
@@ -57,19 +65,19 @@ canvas {
 
 <body>
 <div class="pokedex">
-<h2>POKÉDEX</h2>
+  <h2>POKÉDEX</h2>
 
-<div id="pantallaLista" class="pantalla activa">
-  <input id="buscador" placeholder="Buscar Pokémon...">
-  <div id="listaPokemon"></div>
-</div>
+  <div id="pantallaLista" class="pantalla activa">
+    <input id="buscador" placeholder="Buscar Pokémon...">
+    <div id="listaPokemon"></div>
+  </div>
 
-<div id="pantallaDetalle" class="pantalla">
-  <h3 id="nombrePokemon"></h3>
-  <img id="imagenPokemon" width="120" style="image-rendering: pixelated;">
-  <canvas id="radarStats"></canvas>
-  <button onclick="volver()">VOLVER</button>
-</div>
+  <div id="pantallaDetalle" class="pantalla">
+    <h3 id="nombrePokemon"></h3>
+    <img id="imagenPokemon" width="120" style="image-rendering: pixelated;">
+    <canvas id="radarStats" width="300" height="300"></canvas>
+    <button onclick="volver()">VOLVER</button>
+  </div>
 </div>
 
 <script>
@@ -83,19 +91,8 @@ const imagenPokemon = document.getElementById("imagenPokemon");
 let todos = [];
 let radar;
 
-const fondos = {
-  fire: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/4.svg')",
-  water: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/7.svg')",
-  grass: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/1.svg')",
-  electric: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/25.svg')",
-  ice: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/144.svg')",
-  ghost: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/92.svg')",
-  dragon: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/149.svg')",
-  default: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/133.svg')"
-};
-
 async function cargarTodos() {
-  const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1010");
+  const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
   const data = await res.json();
   todos = data.results;
   mostrarLista(todos);
@@ -121,9 +118,6 @@ async function abrirDetalle(id) {
   nombrePokemon.textContent = data.name.toUpperCase();
   imagenPokemon.src = data.sprites.front_default;
 
-  const tipo = data.types[0].type.name;
-  document.body.style.backgroundImage = fondos[tipo] || fondos.default;
-
   const stats = data.stats.map(s => s.base_stat);
   const etiquetas = ["HP","Ataque","Defensa","At. Esp.","Def. Esp.","Velocidad"];
 
@@ -133,6 +127,7 @@ async function abrirDetalle(id) {
     data: {
       labels: etiquetas,
       datasets: [{
+        label: "Estadísticas",
         data: stats,
         fill: true,
         backgroundColor: "rgba(255,0,0,0.3)",
@@ -144,10 +139,12 @@ async function abrirDetalle(id) {
       scales: {
         r: {
           beginAtZero: true,
-          ticks: { display: false }
+          ticks: {
+            color: "black",
+            backdropColor: "white"
+          }
         }
-      },
-      plugins: { legend: { display: false } }
+      }
     }
   });
 
@@ -169,4 +166,3 @@ cargarTodos();
 </script>
 </body>
 </html>
-
