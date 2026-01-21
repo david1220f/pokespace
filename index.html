@@ -2,83 +2,116 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Mi Pokédex</title>
+<title>Pokédex Avanzada</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
 body {
-    background: #b71c1c;
-    font-family: Arial;
-    text-align: center;
+    margin: 0;
+    background: #8b0000;
+    font-family: 'Press Start 2P', cursive;
     color: white;
+    text-align: center;
 }
+
 #pokedex {
-    background: #d32f2f;
-    width: 350px;
-    margin: auto;
+    width: 900px;
+    margin: 20px auto;
+    background: #c62828;
+    border-radius: 20px;
     padding: 15px;
-    border-radius: 15px;
     box-shadow: 0 0 20px black;
 }
-#screen {
-    background: #e0f7fa;
-    color: black;
-    padding: 10px;
+
+.pantalla {
+    display: none;
+    background: #111;
+    padding: 15px;
     border-radius: 10px;
-    height: 300px;
-    overflow-y: auto;
 }
-.pokemon {
+
+.activa {
+    display: block;
+}
+
+#listaPokemon {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 120px);
+    gap: 10px;
+    justify-content: center;
+}
+
+.pokeItem {
+    background: #222;
+    padding: 5px;
+    border-radius: 10px;
     cursor: pointer;
-    margin: 5px;
 }
-img {
+
+.pokeItem img {
     width: 80px;
 }
-input {
+
+#detalle img {
+    width: 150px;
+}
+
+.graficas {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+canvas {
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+}
+button {
+    font-family: 'Press Start 2P', cursive;
     padding: 8px;
-    width: 80%;
-    border-radius: 5px;
+    margin: 10px;
 }
 </style>
 </head>
+
 <body>
 
-<h1>📕 Mi Pokédex</h1>
-
 <div id="pokedex">
-    <input type="text" id="search" placeholder="Buscar Pokémon..." onkeyup="buscarPokemon()">
-    <div id="screen"></div>
+    <h1>POKÉDEX</h1>
+
+    <!-- PANTALLA 1: LISTA -->
+    <div id="pantallaLista" class="pantalla activa">
+        <input type="text" id="buscador" placeholder="Buscar Pokémon...">
+        <div id="listaPokemon"></div>
+    </div>
+
+    <!-- PANTALLA 2: DETALLE -->
+    <div id="pantallaDetalle" class="pantalla">
+        <button onclick="volver()">⬅ VOLVER</button>
+        <h2 id="nombrePokemon"></h2>
+        <img id="imagenPokemon">
+
+        <div class="graficas">
+            <div>
+                <h3>Estadísticas</h3>
+                <canvas id="graficaStats" width="300" height="300"></canvas>
+            </div>
+            <div>
+                <h3>Top 10 Ataques</h3>
+                <canvas id="graficaAtaques" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <div id="listaAtaques"></div>
+    </div>
 </div>
 
-<audio id="sound" src="https://play.pokemonshowdown.com/audio/cries/pikachu.mp3"></audio>
-
 <script>
-let pokemons = [];
-
-fetch("https://pokeapi.co/api/v2/pokemon?limit=151")
-.then(res => res.json())
-.then(data => {
-    pokemons = data.results;
-    mostrarPokemons(pokemons);
-});
-
-function mostrarPokemons(lista) {
-    let screen = document.getElementById("screen");
-    screen.innerHTML = "";
-    lista.forEach((p, i) => {
-        let div = document.createElement("div");
-        div.className = "pokemon";
-        div.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png"><br>${p.name}`;
-        div.onclick = () => document.getElementById("sound").play();
-        screen.appendChild(div);
-    });
-}
-
-function buscarPokemon() {
-    let texto = document.getElementById("search").value.toLowerCase();
-    let filtrados = pokemons.filter(p => p.name.includes(texto));
-    mostrarPokemons(filtrados);
-}
+// Aquí irá toda la lógica (Parte 2, 3 y 4)
 </script>
 
 </body>
 </html>
+
