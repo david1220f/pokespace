@@ -2,171 +2,133 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pokédex Gen 1</title>
+<title>Pokédex Clásica</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
-    font-family: Arial;
     margin: 0;
-    padding: 0;
+    background: linear-gradient(#b00000, #700000);
+    font-family: 'Press Start 2P', cursive;
 }
 
 .pokedex {
-    width: 650px;
-    margin: 30px auto;
+    width: 800px;
+    margin: 40px auto;
+    background: #d32f2f;
+    border: 8px solid #8b0000;
+    border-radius: 20px;
     padding: 20px;
-    border-radius: 15px;
-    background: white;
+    color: white;
+    box-shadow: 0 0 20px black;
+}
+
+header {
     text-align: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+select, button, input {
+    font-family: 'Press Start 2P', cursive;
+    padding: 6px;
+    border-radius: 6px;
+    border: none;
 }
 
 .contenido {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 15px;
     align-items: center;
-    gap: 10px;
+    background: #111;
+    padding: 15px;
+    border-radius: 10px;
 }
 
-img {
-    width: 120px;
+.pokemon-img {
+    text-align: center;
 }
 
-.stats {
-    text-align: left;
+.pokemon-img img {
+    width: 150px;
+    cursor: pointer;
 }
 
-.tipo-planta { background: #7AC74C; }
-.tipo-fuego { background: #EE8130; }
-.tipo-agua { background: #6390F0; }
-.tipo-electrico { background: #F7D02C; }
-.tipo-veneno { background: #A33EA1; }
-.tipo-volador { background: #A98FF3; }
-.tipo-normal { background: #A8A77A; }
-.tipo-bicho { background: #A6B91A; }
-.tipo-tierra { background: #E2BF65; }
-.tipo-hada { background: #D685AD; }
-.tipo-lucha { background: #C22E28; }
-.tipo-psiquico { background: #F95587; }
-.tipo-roca { background: #B6A136; }
-.tipo-fantasma { background: #735797; }
-.tipo-hielo { background: #96D9D6; }
-.tipo-dragon { background: #6F35FC; }
+.stats-texto {
+    font-size: 10px;
+    line-height: 1.6;
+}
 
 canvas {
-    width: 180px !important;
-    height: 180px !important;
+    max-width: 250px;
+    max-height: 250px;
+}
+
+.controles {
+    text-align: center;
+    margin-top: 10px;
 }
 </style>
 </head>
 
-<body id="fondo">
+<body>
 
 <div class="pokedex">
-    <h2 id="nombre"></h2>
+    <header>
+        <h1>POKÉDEX</h1>
+        <select id="generacion">
+            <option value="1">Generación 1 - Kanto</option>
+            <option value="2">Generación 2 - Johto</option>
+            <option value="3">Generación 3 - Hoenn</option>
+            <option value="4">Generación 4 - Sinnoh</option>
+            <option value="5">Generación 5 - Unova</option>
+            <option value="6">Generación 6 - Kalos</option>
+            <option value="7">Generación 7 - Alola</option>
+            <option value="8">Generación 8 - Galar</option>
+            <option value="9">Generación 9 - Paldea</option>
+        </select>
+    </header>
 
     <div class="contenido">
-        <img id="imagen">
+        <div class="pokemon-img">
+            <img id="imagen" src="">
+            <p id="nombre">---</p>
+        </div>
 
-        <canvas id="grafica" width="180" height="180"></canvas>
+        <div>
+            <canvas id="grafica"></canvas>
+        </div>
 
-        <div class="stats">
+        <div class="stats-texto">
             <p>HP: <span id="hp"></span></p>
             <p>Ataque: <span id="atk"></span></p>
             <p>Defensa: <span id="def"></span></p>
-            <p>Atq. Esp.: <span id="spatk"></span></p>
-            <p>Def. Esp.: <span id="spdef"></span></p>
+            <p>Ataque Esp.: <span id="spatk"></span></p>
+            <p>Defensa Esp.: <span id="spdef"></span></p>
             <p>Velocidad: <span id="speed"></span></p>
         </div>
     </div>
 
-    <br>
-    <button onclick="anterior()">⬅</button>
-    <input id="buscar" placeholder="Nombre o número">
-    <button onclick="buscarPokemon()">Buscar</button>
-    <button onclick="siguiente()">➡</button>
+    <div class="controles">
+        <button id="prev">◀</button>
+        <input id="buscador" placeholder="Nombre o número">
+        <button id="buscar">Buscar</button>
+        <button id="next">▶</button>
+    </div>
 </div>
 
 <script>
-let id = 1;
-let chart;
-
-const coloresTipo = {
-    grass: "tipo-planta",
-    fire: "tipo-fuego",
-    water: "tipo-agua",
-    electric: "tipo-electrico",
-    poison: "tipo-veneno",
-    flying: "tipo-volador",
-    normal: "tipo-normal",
-    bug: "tipo-bicho",
-    ground: "tipo-tierra",
-    fairy: "tipo-hada",
-    fighting: "tipo-lucha",
-    psychic: "tipo-psiquico",
-    rock: "tipo-roca",
-    ghost: "tipo-fantasma",
-    ice: "tipo-hielo",
-    dragon: "tipo-dragon"
-};
-
-async function cargarPokemon(num) {
-    const res = await fetch("https://pokeapi.co/api/v2/pokemon/" + num);
-    const data = await res.json();
-
-    nombre.textContent = "#" + data.id + " " + data.name.toUpperCase();
-    imagen.src = data.sprites.front_default;
-
-    const tipo = data.types[0].type.name;
-    document.body.className = coloresTipo[tipo] || "";
-
-    const stats = data.stats.map(s => s.base_stat);
-
-    hp.textContent = stats[0];
-    atk.textContent = stats[1];
-    def.textContent = stats[2];
-    spatk.textContent = stats[3];
-    spdef.textContent = stats[4];
-    speed.textContent = stats[5];
-
-    if (chart) chart.destroy();
-
-    chart = new Chart(document.getElementById("grafica"), {
-        type: "radar",
-        data: {
-            labels: ["HP","Atk","Def","SpA","SpD","Vel"],
-            datasets: [{
-                data: stats,
-                fill: true
-            }]
-        },
-        options: {
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    max: 200,
-                    ticks: { display: false }
-                }
-            }
-        }
-    });
-}
-
-function siguiente() {
-    if (id < 151) cargarPokemon(++id);
-}
-
-function anterior() {
-    if (id > 1) cargarPokemon(--id);
-}
-
-function buscarPokemon() {
-    cargarPokemon(buscar.value.toLowerCase());
-}
-
-cargarPokemon(id);
+// Aquí irá la lógica (Parte 2)
 </script>
 
 </body>
 </html>
+
+
+
 
