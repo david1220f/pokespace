@@ -114,4 +114,67 @@ button {
 
 </body>
 </html>
+<script>
+const pantallaLista = document.getElementById("pantallaLista");
+const pantallaDetalle = document.getElementById("pantallaDetalle");
+const listaPokemon = document.getElementById("listaPokemon");
+const buscador = document.getElementById("buscador");
+const nombrePokemon = document.getElementById("nombrePokemon");
+const imagenPokemon = document.getElementById("imagenPokemon");
+
+let todos = [];
+
+// Cargar todos los Pokémon (1 a 1010 aprox.)
+async function cargarTodos() {
+  const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=1010");
+  const data = await res.json();
+  todos = data.results;
+  mostrarLista(todos);
+}
+
+function mostrarLista(lista) {
+  listaPokemon.innerHTML = "";
+  lista.forEach((p, i) => {
+    const div = document.createElement("div");
+    div.className = "pokeItem";
+    const id = i + 1;
+    div.innerHTML = `
+      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png">
+      <p>#${id} ${p.name}</p>
+    `;
+    div.onclick = () => abrirDetalle(id);
+    listaPokemon.appendChild(div);
+  });
+}
+
+async function abrirDetalle(id) {
+  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+  const data = await res.json();
+
+  nombrePokemon.textContent = `#${data.id} ${data.name.toUpperCase()}`;
+  imagenPokemon.src = data.sprites.front_default;
+
+  // Cambiar de pantalla
+  pantallaLista.classList.remove("activa");
+  pantallaDetalle.classList.add("activa");
+
+  // (Las gráficas se llenarán en la PARTE 3 y 4)
+}
+
+function volver() {
+  pantallaDetalle.classList.remove("activa");
+  pantallaLista.classList.add("activa");
+}
+
+// Buscador
+buscador.addEventListener("input", () => {
+  const texto = buscador.value.toLowerCase();
+  const filtrados = todos.filter(p => p.name.includes(texto));
+  mostrarLista(filtrados);
+});
+
+// Iniciar
+cargarTodos();
+</script>
+
 
