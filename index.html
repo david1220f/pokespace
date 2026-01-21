@@ -8,11 +8,7 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: #2b2b2b;
-  background-image: url("https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/official-artwork/25.png");
-  background-repeat: no-repeat;
-  background-position: right bottom;
-  background-size: 300px;
+  background: linear-gradient(45deg, #2b2b2b, #1a1a1a);
 }
 
 .pokedex {
@@ -33,9 +29,7 @@ body {
   display: none;
 }
 
-.pantalla.activa {
-  display: block;
-}
+.pantalla.activa { display: block; }
 
 #listaPokemon {
   display: grid;
@@ -57,7 +51,7 @@ body {
 }
 
 canvas {
-  background: white;
+  background: #fff;
   border-radius: 8px;
 }
 </style>
@@ -91,6 +85,18 @@ const imagenPokemon = document.getElementById("imagenPokemon");
 let todos = [];
 let radar;
 
+// Colores tipo bioma (pixel)
+const biomas = {
+  fire: ["#b71c1c", "#ff7043"],
+  water: ["#0d47a1", "#4fc3f7"],
+  grass: ["#1b5e20", "#81c784"],
+  electric: ["#f9a825", "#fff176"],
+  ice: ["#80deea", "#e0f7fa"],
+  ghost: ["#4a148c", "#7e57c2"],
+  dragon: ["#1a237e", "#5c6bc0"],
+  default: ["#263238", "#90a4ae"]
+};
+
 async function cargarTodos() {
   const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
   const data = await res.json();
@@ -118,8 +124,14 @@ async function abrirDetalle(id) {
   nombrePokemon.textContent = data.name.toUpperCase();
   imagenPokemon.src = data.sprites.front_default;
 
-  const stats = data.stats.map(s => s.base_stat);
-  const etiquetas = ["HP","Ataque","Defensa","At. Esp.","Def. Esp.","Velocidad"];
+  const tipo = data.types[0].type.name;
+  const colores = biomas[tipo] || biomas.default;
+  document.body.style.background = `linear-gradient(45deg, ${colores[0]}, ${colores[1]})`;
+
+  const valores = data.stats.map(s => s.base_stat);
+  const nombres = ["HP","ATQ","DEF","ATQ ESP","DEF ESP","VEL"];
+
+  const etiquetas = nombres.map((n, i) => `${n} ${valores[i]}`);
 
   if (radar) radar.destroy();
   radar = new Chart(document.getElementById("radarStats"), {
@@ -127,8 +139,7 @@ async function abrirDetalle(id) {
     data: {
       labels: etiquetas,
       datasets: [{
-        label: "Estadísticas",
-        data: stats,
+        data: valores,
         fill: true,
         backgroundColor: "rgba(255,0,0,0.3)",
         borderColor: "red",
@@ -139,12 +150,10 @@ async function abrirDetalle(id) {
       scales: {
         r: {
           beginAtZero: true,
-          ticks: {
-            color: "black",
-            backdropColor: "white"
-          }
+          ticks: { display: false }
         }
-      }
+      },
+      plugins: { legend: { display: false } }
     }
   });
 
