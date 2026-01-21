@@ -8,6 +8,7 @@
 body {
   margin: 0;
   font-family: Arial;
+  background-image: url("https://images.unsplash.com/photo-1544551763-46a013bb70d5");
   background-size: cover;
   background-position: center;
 }
@@ -15,7 +16,7 @@ body {
 .pokedex {
   width: 420px;
   margin: 20px auto;
-  background: rgba(200,0,0,0.9);
+  background: rgba(180,0,0,0.9);
   border-radius: 12px;
   padding: 10px;
   color: white;
@@ -42,11 +43,15 @@ body {
   text-align: center;
   border-radius: 6px;
   cursor: pointer;
+  padding: 5px;
 }
 
 .pokeItem img { width: 72px; }
 
-canvas { background: rgba(255,255,255,0.9); border-radius: 8px; }
+canvas {
+  background: rgba(255,255,255,0.9);
+  border-radius: 8px;
+}
 </style>
 </head>
 
@@ -79,14 +84,14 @@ let todos = [];
 let radar;
 
 const fondos = {
-  fire: "url('https://i.imgur.com/6Z7bJbM.jpg')",
-  water: "url('https://i.imgur.com/GZ9Yw1S.jpg')",
-  grass: "url('https://i.imgur.com/3m8Z4wQ.jpg')",
-  electric: "url('https://i.imgur.com/0q9Z1Zm.jpg')",
-  ice: "url('https://i.imgur.com/7YF3nUj.jpg')",
-  ghost: "url('https://i.imgur.com/xK0gJ3Z.jpg')",
-  dragon: "url('https://i.imgur.com/FnF7c7P.jpg')",
-  default: "url('https://i.imgur.com/9ZQZ4Zb.jpg')"
+  fire: "url('https://images.unsplash.com/photo-1509223197845-458d87318791')",
+  water: "url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e')",
+  grass: "url('https://images.unsplash.com/photo-1501785888041-af3ef285b470')",
+  electric: "url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d')",
+  ice: "url('https://images.unsplash.com/photo-1482192596544-9eb780fc7f66')",
+  ghost: "url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee')",
+  dragon: "url('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429')",
+  default: "url('https://images.unsplash.com/photo-1544551763-46a013bb70d5')"
 };
 
 async function cargarTodos() {
@@ -101,7 +106,9 @@ function mostrarLista(lista) {
   lista.forEach((p, i) => {
     const div = document.createElement("div");
     div.className = "pokeItem";
-    div.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png"><p>${p.name}</p>`;
+    div.innerHTML = `
+      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png">
+      <p>#${i+1} ${p.name}</p>`;
     div.onclick = () => abrirDetalle(i+1);
     listaPokemon.appendChild(div);
   });
@@ -118,7 +125,7 @@ async function abrirDetalle(id) {
   document.body.style.backgroundImage = fondos[tipo] || fondos.default;
 
   const stats = data.stats.map(s => s.base_stat);
-  const etiquetas = ["HP","ATQ","DEF","ATQ ESP","DEF ESP","VEL"];
+  const etiquetas = ["HP","Ataque","Defensa","At. Esp.","Def. Esp.","Velocidad"];
 
   if (radar) radar.destroy();
   radar = new Chart(document.getElementById("radarStats"), {
@@ -126,13 +133,23 @@ async function abrirDetalle(id) {
     data: {
       labels: etiquetas,
       datasets: [{
-        label: "Estadísticas",
+        label: "Estadísticas Base",
         data: stats,
-        fill: true
+        fill: true,
+        backgroundColor: "rgba(255,0,0,0.3)",
+        borderColor: "red",
+        pointBackgroundColor: "black"
       }]
     },
     options: {
-      scales: { r: { beginAtZero: true, max: 200 } }
+      scales: {
+        r: {
+          beginAtZero: true,
+          ticks: { display: false },
+          pointLabels: { color: "black", font: { size: 12 } }
+        }
+      },
+      plugins: { legend: { display: false } }
     }
   });
 
@@ -154,4 +171,3 @@ cargarTodos();
 </script>
 </body>
 </html>
-
