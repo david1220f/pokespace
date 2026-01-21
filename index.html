@@ -66,7 +66,7 @@ canvas {
 
 <div id="pantallaDetalle" class="pantalla">
   <h3 id="nombrePokemon"></h3>
-  <img id="imagenPokemon" width="150">
+  <img id="imagenPokemon" width="120" style="image-rendering: pixelated;">
   <canvas id="radarStats"></canvas>
   <button onclick="volver()">VOLVER</button>
 </div>
@@ -84,14 +84,14 @@ let todos = [];
 let radar;
 
 const fondos = {
-  fire: "url('https://i.imgur.com/8Q1ZQZB.png')",
-  water: "url('https://i.imgur.com/5R4KQJf.png')",
-  grass: "url('https://i.imgur.com/1n7fH5C.png')",
-  electric: "url('https://i.imgur.com/7yUvePI.png')",
-  ice: "url('https://i.imgur.com/f8c9K9n.png')",
-  ghost: "url('https://i.imgur.com/0XKzn9X.png')",
-  dragon: "url('https://i.imgur.com/3ZQ3ZQK.png')",
-  default: "url('https://i.imgur.com/9yG7R9Q.png')"
+  fire: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/4.svg')",
+  water: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/7.svg')",
+  grass: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/1.svg')",
+  electric: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/25.svg')",
+  ice: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/144.svg')",
+  ghost: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/92.svg')",
+  dragon: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/149.svg')",
+  default: "url('https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/other/dream-world/133.svg')"
 };
 
 async function cargarTodos() {
@@ -133,7 +133,6 @@ async function abrirDetalle(id) {
     data: {
       labels: etiquetas,
       datasets: [{
-        label: "Stats",
         data: stats,
         fill: true,
         backgroundColor: "rgba(255,0,0,0.3)",
@@ -170,3 +169,4 @@ cargarTodos();
 </script>
 </body>
 </html>
+
