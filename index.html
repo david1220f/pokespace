@@ -2,18 +2,83 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pokédex Clásica</title>
-<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<title>Mi Pokédex</title>
 <style>
-body { margin:0; background:#b00000; font-family:'Press Start 2P', cursive; }
-.pokedex { width:800px; margin:40px auto; background:#d32f2f; padding:20px; border-radius:15px; color:white; }
+body {
+    background: #b71c1c;
+    font-family: Arial;
+    text-align: center;
+    color: white;
+}
+#pokedex {
+    background: #d32f2f;
+    width: 350px;
+    margin: auto;
+    padding: 15px;
+    border-radius: 15px;
+    box-shadow: 0 0 20px black;
+}
+#screen {
+    background: #e0f7fa;
+    color: black;
+    padding: 10px;
+    border-radius: 10px;
+    height: 300px;
+    overflow-y: auto;
+}
+.pokemon {
+    cursor: pointer;
+    margin: 5px;
+}
+img {
+    width: 80px;
+}
+input {
+    padding: 8px;
+    width: 80%;
+    border-radius: 5px;
+}
 </style>
 </head>
 <body>
-<div class="pokedex">
-<h1>POKÉDEX</h1>
-<p>Si ves esto, ya funciona.</p>
+
+<h1>📕 Mi Pokédex</h1>
+
+<div id="pokedex">
+    <input type="text" id="search" placeholder="Buscar Pokémon..." onkeyup="buscarPokemon()">
+    <div id="screen"></div>
 </div>
+
+<audio id="sound" src="https://play.pokemonshowdown.com/audio/cries/pikachu.mp3"></audio>
+
+<script>
+let pokemons = [];
+
+fetch("https://pokeapi.co/api/v2/pokemon?limit=151")
+.then(res => res.json())
+.then(data => {
+    pokemons = data.results;
+    mostrarPokemons(pokemons);
+});
+
+function mostrarPokemons(lista) {
+    let screen = document.getElementById("screen");
+    screen.innerHTML = "";
+    lista.forEach((p, i) => {
+        let div = document.createElement("div");
+        div.className = "pokemon";
+        div.innerHTML = `<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png"><br>${p.name}`;
+        div.onclick = () => document.getElementById("sound").play();
+        screen.appendChild(div);
+    });
+}
+
+function buscarPokemon() {
+    let texto = document.getElementById("search").value.toLowerCase();
+    let filtrados = pokemons.filter(p => p.name.includes(texto));
+    mostrarPokemons(filtrados);
+}
+</script>
+
 </body>
 </html>
-
