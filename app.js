@@ -4,9 +4,11 @@ const spriteImg = document.getElementById("pokemonSprite");
 const attackList = document.getElementById("attackList");
 const genSelect = document.getElementById("genSelect");
 const searchInput = document.getElementById("search");
+const detail = document.getElementById("detail");
 
 let radarChart;
 
+// Rangos por generación
 const genRanges = {
   1: [1, 151],
   2: [152, 251],
@@ -19,6 +21,34 @@ const genRanges = {
   9: [906, 1017]
 };
 
+// Fondos pixel tipo bioma
+const biomeBackgrounds = {
+  fire: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/volcano.gif",
+  water: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/ocean.gif",
+  grass: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/forest.gif",
+  electric: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/powerplant.gif",
+  rock: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/desert.gif",
+  ground: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/desert.gif",
+  ice: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/snow.gif",
+  ghost: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/haunted.gif",
+  dragon: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/mountain.gif",
+  normal: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/field.gif",
+  psychic: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/space.gif",
+  bug: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/forest.gif",
+  fairy: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/magic.gif",
+  fighting: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/mountain.gif",
+  poison: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/swamp.gif"
+};
+
+function setBiome(types) {
+  const mainType = types[0].type.name;
+  const bg = biomeBackgrounds[mainType] || biomeBackgrounds.normal;
+  detail.style.backgroundImage = `url(${bg})`;
+  detail.style.backgroundSize = "cover";
+  detail.style.backgroundPosition = "center";
+}
+
+// Cargar generación
 async function loadGen(gen) {
   listDiv.innerHTML = "";
   const [start, end] = genRanges[gen];
@@ -35,11 +65,21 @@ async function loadGen(gen) {
   }
 }
 
+// Mostrar Pokémon
 function showPokemon(pokemon) {
   nameTitle.textContent = pokemon.name.toUpperCase();
   spriteImg.src = pokemon.sprites.front_default;
+
+  // Fondo por bioma
   setBiome(pokemon.types);
 
+  // Sonido del Pokémon
+  if (pokemon.cries && pokemon.cries.latest) {
+    const cry = new Audio(pokemon.cries.latest);
+    cry.play();
+  }
+
+  // Estadísticas
   const stats = pokemon.stats.map(s => s.base_stat);
   const labels = ["HP", "ATQ", "DEF", "ATQ ESP", "DEF ESP", "VEL"];
 
@@ -47,70 +87,50 @@ function showPokemon(pokemon) {
   radarChart = new Chart(document.getElementById("radarChart"), {
     type: 'radar',
     data: {
-      labels: labels,
+      labels: labels.map((l, i) => `${l}: ${stats[i]}`),
       datasets: [{
         label: pokemon.name,
         data: stats,
-        backgroundColor: "rgba(255,0,0,0.3)",
-        borderColor: "red",
-        pointBackgroundColor: "yellow"
+        backgroundColor: "rgba(255,255,255,0.2)",
+        borderColor: "#00ffcc",
+        pointBackgroundColor: "#00ffcc"
       }]
     },
     options: {
+      plugins: { legend: { display: false } },
       scales: {
         r: {
           ticks: { display: false },
-          grid: { color: "#444" },
-          angleLines: { color: "#444" }
+          grid: { color: "#888" },
+          angleLines: { color: "#888" },
+          pointLabels: {
+            color: "white",
+            font: { size: 12 }
+          }
         }
       }
     }
   });
 
+  // Ataques (Top 10)
   attackList.innerHTML = "";
   pokemon.moves.slice(0, 10).forEach(move => {
     const li = document.createElement("li");
     li.textContent = move.move.name;
     attackList.appendChild(li);
   });
-const cry = new Audio(pokemon.cries.latest);
-cry.play();
 }
 
+// Selector de generación
 genSelect.addEventListener("change", () => loadGen(genSelect.value));
 
+// Buscador
 searchInput.addEventListener("input", () => {
   const term = searchInput.value.toLowerCase();
   document.querySelectorAll(".poke-item").forEach(item => {
-    item.style.display = item.textContent.includes(term) ? "flex" : "none";
+    item.style.display = item.textContent.toLowerCase().includes(term) ? "flex" : "none";
   });
 });
 
+// Cargar Gen 1 por defecto
 loadGen(1);
-const detail = document.getElementById("detail");
-
-// Fondos pixel por tipo (biomas)
-const biomeBackgrounds = {
-  fire: "https://i.imgur.com/6L6bKqN.gif",      // volcán pixel
-  water: "https://i.imgur.com/7a8H3Zx.gif",     // océano pixel
-  grass: "https://i.imgur.com/qz7JQ6G.gif",     // bosque pixel
-  electric: "https://i.imgur.com/yvQZb0s.gif",  // central eléctrica pixel
-  rock: "https://i.imgur.com/2s9ZyO0.gif",      // desierto pixel
-  ground: "https://i.imgur.com/2s9ZyO0.gif",
-  ice: "https://i.imgur.com/vcC5F7F.gif",       // glaciar pixel
-  ghost: "https://i.imgur.com/LzJ0Y5C.gif",     // torre oscura pixel
-  dragon: "https://i.imgur.com/0H8Qp2b.gif",
-  normal: "https://i.imgur.com/9m7fK0L.gif",
-  psychic: "https://i.imgur.com/4S4xk8f.gif",
-  bug: "https://i.imgur.com/qz7JQ6G.gif",
-  fairy: "https://i.imgur.com/VFZgG6o.gif",
-  fighting: "https://i.imgur.com/2s9ZyO0.gif",
-  poison: "https://i.imgur.com/4S4xk8f.gif"
-};
-
-function setBiome(types) {
-  const mainType = types[0].type.name;
-  const bg = biomeBackgrounds[mainType] || biomeBackgrounds.normal;
-  detail.style.backgroundImage = `url(${bg})`;
-}
-
