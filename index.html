@@ -2,176 +2,123 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Pokédex Pixel</title>
+<title>Pokédex Pixel Pro</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(45deg, #2b2b2b, #1a1a1a);
+body{
+  margin:0;
+  font-family:Arial;
+  background-size:cover;
+  background-attachment:fixed;
 }
-
-.pokedex {
-  width: 420px;
-  margin: 20px auto;
-  background: #c62828;
-  border-radius: 12px;
-  padding: 10px;
-  color: white;
-  box-shadow: 0 0 15px black;
+#pokedex{
+  width:420px;
+  margin:auto;
+  background:#c62828;
+  border-radius:10px;
+  padding:10px;
+  color:white;
 }
-
-.pantalla {
-  background: #111;
-  border-radius: 10px;
-  padding: 10px;
-  min-height: 450px;
-  display: none;
-}
-
-.pantalla.activa { display: block; }
-
-#listaPokemon {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-
-.pokeItem {
-  background: #333;
-  text-align: center;
-  border-radius: 6px;
-  cursor: pointer;
-  padding: 5px;
-}
-
-.pokeItem img {
-  width: 72px;
-  image-rendering: pixelated;
-}
-
-canvas {
-  background: #fff;
-  border-radius: 8px;
-}
+.pantalla{background:#111;padding:10px;border-radius:8px;display:none;}
+.activa{display:block;}
+#lista{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
+.poke{background:#333;border-radius:5px;text-align:center;cursor:pointer;}
+.poke img{width:72px;image-rendering:pixelated;}
+canvas{background:white;border-radius:8px;}
 </style>
 </head>
 
 <body>
-<div class="pokedex">
-  <h2>POKÉDEX</h2>
+<div id="pokedex">
+<h2>POKÉDEX</h2>
 
-  <div id="pantallaLista" class="pantalla activa">
-    <input id="buscador" placeholder="Buscar Pokémon...">
-    <div id="listaPokemon"></div>
-  </div>
+<div id="listaPantalla" class="pantalla activa">
+<input id="buscar" placeholder="Buscar Pokémon">
+<div id="lista"></div>
+</div>
 
-  <div id="pantallaDetalle" class="pantalla">
-    <h3 id="nombrePokemon"></h3>
-    <img id="imagenPokemon" width="120" style="image-rendering: pixelated;">
-    <canvas id="radarStats" width="300" height="300"></canvas>
-    <button onclick="volver()">VOLVER</button>
-  </div>
+<div id="detallePantalla" class="pantalla">
+<h3 id="nombre"></h3>
+<img id="sprite" width="120" style="image-rendering:pixelated">
+<canvas id="radar" width="300" height="300"></canvas>
+<h4>Ataques principales</h4>
+<ul id="ataques"></ul>
+<button onclick="volver()">Volver</button>
+</div>
 </div>
 
 <script>
-const listaPokemon = document.getElementById("listaPokemon");
-const buscador = document.getElementById("buscador");
-const pantallaLista = document.getElementById("pantallaLista");
-const pantallaDetalle = document.getElementById("pantallaDetalle");
-const nombrePokemon = document.getElementById("nombrePokemon");
-const imagenPokemon = document.getElementById("imagenPokemon");
-
-let todos = [];
-let radar;
-
-// Colores tipo bioma (pixel)
-const biomas = {
-  fire: ["#b71c1c", "#ff7043"],
-  water: ["#0d47a1", "#4fc3f7"],
-  grass: ["#1b5e20", "#81c784"],
-  electric: ["#f9a825", "#fff176"],
-  ice: ["#80deea", "#e0f7fa"],
-  ghost: ["#4a148c", "#7e57c2"],
-  dragon: ["#1a237e", "#5c6bc0"],
-  default: ["#263238", "#90a4ae"]
+const fondos={
+fire:"https://i.imgur.com/9b1Z7yP.png",
+water:"https://i.imgur.com/6Z5KZyN.png",
+grass:"https://i.imgur.com/7P0D8J2.png",
+electric:"https://i.imgur.com/3xK7F5W.png",
+ghost:"https://i.imgur.com/dZJxk6V.png",
+ice:"https://i.imgur.com/3hP1B6m.png",
+dragon:"https://i.imgur.com/8FZ6z0p.png",
+default:"https://i.imgur.com/ZpK7W2P.png"
 };
 
-async function cargarTodos() {
-  const res = await fetch("https://pokeapi.co/api/v2/pokemon?limit=151");
-  const data = await res.json();
-  todos = data.results;
-  mostrarLista(todos);
-}
+let todos=[],grafico;
 
-function mostrarLista(lista) {
-  listaPokemon.innerHTML = "";
-  lista.forEach((p, i) => {
-    const div = document.createElement("div");
-    div.className = "pokeItem";
-    div.innerHTML = `
-      <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png">
-      <p>#${i+1} ${p.name}</p>`;
-    div.onclick = () => abrirDetalle(i+1);
-    listaPokemon.appendChild(div);
+async function cargar(){
+  const r=await fetch("https://pokeapi.co/api/v2/pokemon?limit=1010");
+  const d=await r.json();
+  todos=d.results;
+  mostrar(todos);
+}
+function mostrar(lista){
+  document.getElementById("lista").innerHTML="";
+  lista.forEach((p,i)=>{
+    const div=document.createElement("div");
+    div.className="poke";
+    div.innerHTML=`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png"><br>${p.name}`;
+    div.onclick=()=>abrir(i+1);
+    document.getElementById("lista").appendChild(div);
   });
 }
+async function abrir(id){
+  const r=await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+  const p=await r.json();
+  document.getElementById("nombre").textContent=p.name.toUpperCase();
+  document.getElementById("sprite").src=p.sprites.front_default;
 
-async function abrirDetalle(id) {
-  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-  const data = await res.json();
+  const tipo=p.types[0].type.name;
+  document.body.style.backgroundImage=`url(${fondos[tipo]||fondos.default})`;
 
-  nombrePokemon.textContent = data.name.toUpperCase();
-  imagenPokemon.src = data.sprites.front_default;
+  const stats=p.stats.map(s=>s.base_stat);
+  const nombres=["HP","ATQ","DEF","ATQ ESP","DEF ESP","VEL"];
+  const etiquetas=nombres.map((n,i)=>`${n}\n${stats[i]}`);
 
-  const tipo = data.types[0].type.name;
-  const colores = biomas[tipo] || biomas.default;
-  document.body.style.background = `linear-gradient(45deg, ${colores[0]}, ${colores[1]})`;
-
-  const valores = data.stats.map(s => s.base_stat);
-  const nombres = ["HP","ATQ","DEF","ATQ ESP","DEF ESP","VEL"];
-
-  const etiquetas = nombres.map((n, i) => `${n} ${valores[i]}`);
-
-  if (radar) radar.destroy();
-  radar = new Chart(document.getElementById("radarStats"), {
-    type: "radar",
-    data: {
-      labels: etiquetas,
-      datasets: [{
-        data: valores,
-        fill: true,
-        backgroundColor: "rgba(255,0,0,0.3)",
-        borderColor: "red",
-        pointBackgroundColor: "black"
-      }]
-    },
-    options: {
-      scales: {
-        r: {
-          beginAtZero: true,
-          ticks: { display: false }
-        }
-      },
-      plugins: { legend: { display: false } }
-    }
+  if(grafico)grafico.destroy();
+  grafico=new Chart(document.getElementById("radar"),{
+    type:"radar",
+    data:{labels:etiquetas,datasets:[{data:stats,backgroundColor:"rgba(255,0,0,0.3)",borderColor:"red"}]},
+    options:{scales:{r:{ticks:{display:false}}},plugins:{legend:{display:false}}}
   });
 
-  pantallaLista.classList.remove("activa");
-  pantallaDetalle.classList.add("activa");
-}
+  const listaAtaques=document.getElementById("ataques");
+  listaAtaques.innerHTML="";
+  const mejores=p.moves.slice(0,10);
+  for(let m of mejores){
+    const li=document.createElement("li");
+    li.textContent=m.move.name;
+    listaAtaques.appendChild(li);
+  }
 
-function volver() {
-  pantallaDetalle.classList.remove("activa");
-  pantallaLista.classList.add("activa");
+  document.getElementById("listaPantalla").classList.remove("activa");
+  document.getElementById("detallePantalla").classList.add("activa");
 }
-
-buscador.addEventListener("input", () => {
-  const texto = buscador.value.toLowerCase();
-  mostrarLista(todos.filter(p => p.name.includes(texto)));
+function volver(){
+  document.getElementById("detallePantalla").classList.remove("activa");
+  document.getElementById("listaPantalla").classList.add("activa");
+}
+document.getElementById("buscar").addEventListener("input",e=>{
+  const t=e.target.value.toLowerCase();
+  mostrar(todos.filter(p=>p.name.includes(t)));
 });
-
-cargarTodos();
+cargar();
 </script>
 </body>
 </html>
+
