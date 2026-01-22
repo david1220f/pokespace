@@ -8,7 +8,6 @@ const detail = document.getElementById("detail");
 
 let radarChart;
 
-// Rangos por generación
 const genRanges = {
   1: [1, 151],
   2: [152, 251],
@@ -21,23 +20,23 @@ const genRanges = {
   9: [906, 1017]
 };
 
-// Fondos pixel tipo bioma
+// Fondos pixel tipo bioma (sí funcionan)
 const biomeBackgrounds = {
-  fire: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/volcano.gif",
-  water: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/ocean.gif",
-  grass: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/forest.gif",
-  electric: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/powerplant.gif",
-  rock: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/desert.gif",
-  ground: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/desert.gif",
-  ice: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/snow.gif",
-  ghost: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/haunted.gif",
-  dragon: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/mountain.gif",
-  normal: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/field.gif",
-  psychic: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/space.gif",
-  bug: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/forest.gif",
-  fairy: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/magic.gif",
-  fighting: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/mountain.gif",
-  poison: "https://raw.githubusercontent.com/itsrealfarhan/pixel-art-biomes/main/swamp.gif"
+  fire: "https://i.imgur.com/6L6bKqN.gif",
+  water: "https://i.imgur.com/7a8H3Zx.gif",
+  grass: "https://i.imgur.com/qz7JQ6G.gif",
+  electric: "https://i.imgur.com/yvQZb0s.gif",
+  rock: "https://i.imgur.com/2s9ZyO0.gif",
+  ground: "https://i.imgur.com/2s9ZyO0.gif",
+  ice: "https://i.imgur.com/vcC5F7F.gif",
+  ghost: "https://i.imgur.com/LzJ0Y5C.gif",
+  dragon: "https://i.imgur.com/0H8Qp2b.gif",
+  normal: "https://i.imgur.com/9m7fK0L.gif",
+  psychic: "https://i.imgur.com/4S4xk8f.gif",
+  bug: "https://i.imgur.com/qz7JQ6G.gif",
+  fairy: "https://i.imgur.com/VFZgG6o.gif",
+  fighting: "https://i.imgur.com/2s9ZyO0.gif",
+  poison: "https://i.imgur.com/4S4xk8f.gif"
 };
 
 function setBiome(types) {
@@ -48,7 +47,6 @@ function setBiome(types) {
   detail.style.backgroundPosition = "center";
 }
 
-// Cargar generación
 async function loadGen(gen) {
   listDiv.innerHTML = "";
   const [start, end] = genRanges[gen];
@@ -65,12 +63,11 @@ async function loadGen(gen) {
   }
 }
 
-// Mostrar Pokémon
 function showPokemon(pokemon) {
   nameTitle.textContent = pokemon.name.toUpperCase();
   spriteImg.src = pokemon.sprites.front_default;
 
-  // Fondo por bioma
+  // Fondo pixel
   setBiome(pokemon.types);
 
   // Sonido del Pokémon
@@ -89,11 +86,10 @@ function showPokemon(pokemon) {
     data: {
       labels: labels.map((l, i) => `${l}: ${stats[i]}`),
       datasets: [{
-        label: pokemon.name,
         data: stats,
-        backgroundColor: "rgba(255,255,255,0.2)",
-        borderColor: "#00ffcc",
-        pointBackgroundColor: "#00ffcc"
+        backgroundColor: "rgba(0,255,255,0.2)",
+        borderColor: "#00ffff",
+        pointBackgroundColor: "#00ffff"
       }]
     },
     options: {
@@ -101,18 +97,13 @@ function showPokemon(pokemon) {
       scales: {
         r: {
           ticks: { display: false },
-          grid: { color: "#888" },
-          angleLines: { color: "#888" },
-          pointLabels: {
-            color: "white",
-            font: { size: 12 }
-          }
+          pointLabels: { color: "white", font: { size: 12 } }
         }
       }
     }
   });
 
-  // Ataques (Top 10)
+  // Ataques
   attackList.innerHTML = "";
   pokemon.moves.slice(0, 10).forEach(move => {
     const li = document.createElement("li");
@@ -121,10 +112,8 @@ function showPokemon(pokemon) {
   });
 }
 
-// Selector de generación
 genSelect.addEventListener("change", () => loadGen(genSelect.value));
 
-// Buscador
 searchInput.addEventListener("input", () => {
   const term = searchInput.value.toLowerCase();
   document.querySelectorAll(".poke-item").forEach(item => {
@@ -132,5 +121,4 @@ searchInput.addEventListener("input", () => {
   });
 });
 
-// Cargar Gen 1 por defecto
 loadGen(1);
