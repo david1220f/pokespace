@@ -1,123 +1,289 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Pokédex Pixel Pro</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <style>
+:root{
+  --bg:#0b0f14; --panel:#121826; --text:#e6ecf2; --muted:#9fb0c3;
+  --accent:#5ddcff;
+}
+*{box-sizing:border-box;font-family:system-ui,Segoe UI,Roboto,Arial}
 body{
-  margin:0;
-  font-family:Arial;
-  background-size:cover;
-  background-attachment:fixed;
+  margin:0;color:var(--text);background:var(--bg);min-height:100vh;
+  background-size:32px 32px;
+  background-image:
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px);
+  transition:background 0.8s ease;
 }
-#pokedex{
-  width:420px;
-  margin:auto;
-  background:#c62828;
-  border-radius:10px;
-  padding:10px;
-  color:white;
+header{
+  position:sticky;top:0;z-index:10;
+  background:linear-gradient(180deg,#0b0f14,#0b0f14cc);
+  border-bottom:1px solid #1c2433;
+  padding:10px 14px;display:flex;gap:10px;align-items:center
 }
-.pantalla{background:#111;padding:10px;border-radius:8px;display:none;}
-.activa{display:block;}
-#lista{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;}
-.poke{background:#333;border-radius:5px;text-align:center;cursor:pointer;}
-.poke img{width:72px;image-rendering:pixelated;}
-canvas{background:white;border-radius:8px;}
+h1{font-size:18px;margin:0}
+select,input{background:#0f1624;color:var(--text);border:1px solid #1c2433;border-radius:8px;padding:8px}
+main{display:grid;grid-template-columns:320px 1fr;gap:12px;padding:12px}
+#list{background:var(--panel);border-radius:14px;overflow:auto;max-height:calc(100vh - 110px);border:1px solid #1c2433}
+.pkm{display:flex;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid #1c2433;cursor:pointer}
+.pkm:hover{background:#0f1624}
+.pkm img{width:40px;height:40px;image-rendering:pixelated}
+#detail{background:var(--panel);border-radius:14px;border:1px solid #1c2433;padding:12px;display:grid;grid-template-columns:280px 1fr;gap:12px}
+.card{background:#0f1624;border:1px solid #1c2433;border-radius:12px;padding:10px}
+#hero{display:flex;flex-direction:column;align-items:center;gap:8px}
+#hero img{width:160px;height:160px;image-rendering:pixelated}
+.types{display:flex;gap:6px}
+.type{padding:4px 8px;border-radius:999px;background:#1c2433;font-size:12px}
+.stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px
+}
+.stat{background:#0b1220;border:1px solid #1c2433;border-radius:10px;padding:6px;text-align:center}
+.stat b{display:block;font-size:12px;color:var(--muted)}
+.stat span{font-size:16px}
+
+/* ===== BIOMAS PIXEL (CSS) POR TIPO ===== */
+body.fire{
+  background:
+    repeating-linear-gradient(45deg,#3a0a0a 0 8px,#6b0f0f 8px 16px),
+    radial-gradient(circle at 20% 20%, #ff7a00 0 8%, transparent 9%),
+    #140202;
+}
+body.water{
+  background:
+    repeating-linear-gradient(90deg,#0b274a 0 8px,#0f3b73 8px 16px),
+    repeating-linear-gradient(0deg, rgba(255,255,255,.08) 0 1px, transparent 1px 8px);
+}
+body.grass{
+  background:
+    repeating-linear-gradient(45deg,#0b3a1a 0 8px,#145c2b 8px 16px),
+    radial-gradient(circle at 70% 30%, #1fa15a 0 6%, transparent 7%);
+}
+body.electric{
+  background:
+    repeating-linear-gradient(90deg,#2b2b00 0 8px,#4a4a00 8px 16px),
+    linear-gradient(45deg, transparent 45%, #ffe600 50%, transparent 55%);
+}
+body.ghost{
+  background:
+    repeating-linear-gradient(45deg,#120b1a 0 8px,#241334 8px 16px),
+    radial-gradient(circle at 50% 40%, #6b3fa0 0 6%, transparent 7%);
+}
+body.ice{
+  background:
+    repeating-linear-gradient(90deg,#0b2a3a 0 8px,#114a66 8px 16px),
+    radial-gradient(circle at 30% 30%, #c7f2ff 0 6%, transparent 7%);
+}
+body.rock, body.ground{
+  background:
+    repeating-linear-gradient(45deg,#2b1f12 0 8px,#4a3620 8px 16px);
+}
+body.dragon{
+  background:
+    repeating-linear-gradient(45deg,#1a102a 0 8px,#2f1b4a 8px 16px);
+}
+body.psychic{
+  background:
+    repeating-linear-gradient(45deg,#2a1020 0 8px,#4a1b38 8px 16px);
+}
+body.bug{
+  background:
+    repeating-linear-gradient(45deg,#1a2a10 0 8px,#2f4a1b 8px 16px);
+}
+body.fairy{
+  background:
+    repeating-linear-gradient(45deg,#2a1020 0 8px,#4a1b38 8px 16px);
+}
+body.steel{
+  background:
+    repeating-linear-gradient(45deg,#1b1f2a 0 8px,#2a314a 8px 16px);
+}
+body.fighting{
+  background:
+    repeating-linear-gradient(45deg,#2a160f 0 8px,#4a271b 8px 16px);
+}
+body.normal{
+  background:
+    repeating-linear-gradient(45deg,#1b1b1b 0 8px,#2a2a2a 8px 16px);
+}
 </style>
 </head>
+<body class="normal">
+<header>
+  <h1>Pokédex Pixel Pro</h1>
+  <select id="gen">
+    <option value="1">Gen 1</option>
+    <option value="2">Gen 2</option>
+    <option value="3">Gen 3</option>
+    <option value="4">Gen 4</option>
+    <option value="5">Gen 5</option>
+    <option value="6">Gen 6</option>
+    <option value="7">Gen 7</option>
+    <option value="8">Gen 8</option>
+    <option value="9">Gen 9</option>
+  </select>
+  <input id="search" placeholder="Buscar Pokémon..." />
+</header>
 
-<body>
-<div id="pokedex">
-<h2>POKÉDEX</h2>
+<main>
+  <div id="list"></div>
 
-<div id="listaPantalla" class="pantalla activa">
-<input id="buscar" placeholder="Buscar Pokémon">
-<div id="lista"></div>
-</div>
+  <div id="detail">
+    <div class="card" id="hero">
+      <img id="sprite" src="" alt="">
+      <h2 id="name"></h2>
+      <div class="types" id="types"></div>
 
-<div id="detallePantalla" class="pantalla">
-<h3 id="nombre"></h3>
-<img id="sprite" width="120" style="image-rendering:pixelated">
-<canvas id="radar" width="300" height="300"></canvas>
-<h4>Ataques principales</h4>
-<ul id="ataques"></ul>
-<button onclick="volver()">Volver</button>
-</div>
-</div>
+      <div class="stats">
+        <div class="stat"><b>HP</b><span id="hp">0</span></div>
+        <div class="stat"><b>ATQ</b><span id="atk">0</span></div>
+        <div class="stat"><b>DEF</b><span id="def">0</span></div>
+        <div class="stat"><b>ATQ ESP</b><span id="spa">0</span></div>
+        <div class="stat"><b>DEF ESP</b><span id="spd">0</span></div>
+        <div class="stat"><b>VEL</b><span id="spe">0</span></div>
+      </div>
+    </div>
 
+    <div class="card">
+      <canvas id="radar" width="300" height="300"></canvas>
+    </div>
+
+    <div class="card">
+      <h3>Ataques principales</h3>
+      <ul id="moves"></ul>
+    </div>
+  </div>
+</main>
+
+<audio id="bgm" loop autoplay>
+  <source src="https://vgmsite.com/soundtracks/pokemon-ruby-sapphire-emerald-music-super-complete/hqfnhhsc/101%20-%20Opening.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="cry"></audio>
 <script>
-const fondos={
-fire:"https://i.imgur.com/9b1Z7yP.png",
-water:"https://i.imgur.com/6Z5KZyN.png",
-grass:"https://i.imgur.com/7P0D8J2.png",
-electric:"https://i.imgur.com/3xK7F5W.png",
-ghost:"https://i.imgur.com/dZJxk6V.png",
-ice:"https://i.imgur.com/3hP1B6m.png",
-dragon:"https://i.imgur.com/8FZ6z0p.png",
-default:"https://i.imgur.com/ZpK7W2P.png"
+const listEl = document.getElementById("list");
+const nameEl = document.getElementById("name");
+const spriteEl = document.getElementById("sprite");
+const typesEl = document.getElementById("types");
+const movesEl = document.getElementById("moves");
+const cryEl = document.getElementById("cry");
+
+const statsEls = {
+  hp: document.getElementById("hp"),
+  atk: document.getElementById("atk"),
+  def: document.getElementById("def"),
+  spa: document.getElementById("spa"),
+  spd: document.getElementById("spd"),
+  spe: document.getElementById("spe")
 };
 
-let todos=[],grafico;
+const canvas = document.getElementById("radar");
+const ctx = canvas.getContext("2d");
 
-async function cargar(){
-  const r=await fetch("https://pokeapi.co/api/v2/pokemon?limit=1010");
-  const d=await r.json();
-  todos=d.results;
-  mostrar(todos);
+const gens = {
+  1: [1,151], 2:[152,251], 3:[252,386], 4:[387,493],
+  5:[494,649], 6:[650,721], 7:[722,809], 8:[810,905], 9:[906,1010]
+};
+
+function drawRadar(stats){
+  ctx.clearRect(0,0,300,300);
+  const cx=150, cy=150, r=100;
+  const labels = ["HP","ATQ","DEF","ATQ ESP","DEF ESP","VEL"];
+  const values = stats.map(s=>s.base_stat/255);
+
+  ctx.strokeStyle="#5ddcff";
+  ctx.beginPath();
+  for(let i=0;i<6;i++){
+    const ang = (Math.PI*2/6)*i - Math.PI/2;
+    const x = cx + Math.cos(ang)*r*values[i];
+    const y = cy + Math.sin(ang)*r*values[i];
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.closePath();
+  ctx.stroke();
+
+  // líneas
+  for(let i=0;i<6;i++){
+    const ang = (Math.PI*2/6)*i - Math.PI/2;
+    ctx.beginPath();
+    ctx.moveTo(cx,cy);
+    ctx.lineTo(cx+Math.cos(ang)*r, cy+Math.sin(ang)*r);
+    ctx.strokeStyle="#1c2433";
+    ctx.stroke();
+  }
 }
-function mostrar(lista){
-  document.getElementById("lista").innerHTML="";
-  lista.forEach((p,i)=>{
-    const div=document.createElement("div");
-    div.className="poke";
-    div.innerHTML=`<img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i+1}.png"><br>${p.name}`;
-    div.onclick=()=>abrir(i+1);
-    document.getElementById("lista").appendChild(div);
-  });
-}
-async function abrir(id){
-  const r=await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
-  const p=await r.json();
-  document.getElementById("nombre").textContent=p.name.toUpperCase();
-  document.getElementById("sprite").src=p.sprites.front_default;
 
-  const tipo=p.types[0].type.name;
-  document.body.style.backgroundImage=`url(${fondos[tipo]||fondos.default})`;
+async function loadPokemon(id){
+  const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}`);
+  const p = await res.json();
 
-  const stats=p.stats.map(s=>s.base_stat);
-  const nombres=["HP","ATQ","DEF","ATQ ESP","DEF ESP","VEL"];
-  const etiquetas=nombres.map((n,i)=>`${n}\n${stats[i]}`);
+  nameEl.textContent = p.name.toUpperCase();
+  spriteEl.src = p.sprites.front_default;
+  cryEl.src = `https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/${id}.ogg`;
+  cryEl.play();
 
-  if(grafico)grafico.destroy();
-  grafico=new Chart(document.getElementById("radar"),{
-    type:"radar",
-    data:{labels:etiquetas,datasets:[{data:stats,backgroundColor:"rgba(255,0,0,0.3)",borderColor:"red"}]},
-    options:{scales:{r:{ticks:{display:false}}},plugins:{legend:{display:false}}}
+  // tipos y bioma
+  typesEl.innerHTML="";
+  document.body.className="";
+  p.types.forEach(t=>{
+    const span=document.createElement("span");
+    span.className="type";
+    span.textContent=t.type.name;
+    typesEl.appendChild(span);
+    document.body.classList.add(t.type.name);
   });
 
-  const listaAtaques=document.getElementById("ataques");
-  listaAtaques.innerHTML="";
-  const mejores=p.moves.slice(0,10);
-  for(let m of mejores){
+  // stats
+  const s = p.stats;
+  statsEls.hp.textContent = s[0].base_stat;
+  statsEls.atk.textContent = s[1].base_stat;
+  statsEls.def.textContent = s[2].base_stat;
+  statsEls.spa.textContent = s[3].base_stat;
+  statsEls.spd.textContent = s[4].base_stat;
+  statsEls.spe.textContent = s[5].base_stat;
+
+  drawRadar(s);
+
+  // ataques (top 10 por potencia)
+  movesEl.innerHTML="";
+  const moves = p.moves.slice(0,10);
+  for(const m of moves){
     const li=document.createElement("li");
     li.textContent=m.move.name;
-    listaAtaques.appendChild(li);
+    movesEl.appendChild(li);
   }
+}
 
-  document.getElementById("listaPantalla").classList.remove("activa");
-  document.getElementById("detallePantalla").classList.add("activa");
+async function loadGen(gen){
+  listEl.innerHTML="";
+  const [a,b]=gens[gen];
+  for(let i=a;i<=b;i++){
+    const res=await fetch(`https://pokeapi.co/api/v2/pokemon/${i}`);
+    const p=await res.json();
+    const div=document.createElement("div");
+    div.className="pkm";
+    div.innerHTML=`<img src="${p.sprites.front_default}"><span>${i}. ${p.name}</span>`;
+    div.onclick=()=>loadPokemon(i);
+    listEl.appendChild(div);
+  }
 }
-function volver(){
-  document.getElementById("detallePantalla").classList.remove("activa");
-  document.getElementById("listaPantalla").classList.add("activa");
-}
-document.getElementById("buscar").addEventListener("input",e=>{
-  const t=e.target.value.toLowerCase();
-  mostrar(todos.filter(p=>p.name.includes(t)));
-});
-cargar();
+
+document.getElementById("gen").onchange=e=>{
+  loadGen(e.target.value);
+};
+
+document.getElementById("search").oninput=e=>{
+  const q=e.target.value.toLowerCase();
+  document.querySelectorAll(".pkm").forEach(p=>{
+    p.style.display = p.textContent.toLowerCase().includes(q) ? "flex":"none";
+  });
+};
+
+// Inicial
+loadGen(1);
 </script>
 </body>
 </html>
