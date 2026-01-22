@@ -22,22 +22,23 @@ const genRanges = {
 
 // Fondos estilo Pokémon Esmeralda (pixel)
 const biomeBackgrounds = {
-  grass: "https://archives.bulbagarden.net/media/upload/9/9e/Hoenn_Safari_Zone_RSE.png",
-  fire: "https://archives.bulbagarden.net/media/upload/6/6b/Mt_Chimney_RSE.png",
-  water: "https://archives.bulbagarden.net/media/upload/4/45/Hoenn_Route_134_RSE.png",
-  electric: "https://archives.bulbagarden.net/media/upload/0/08/New_Mauville_RSE.png",
-  ghost: "https://archives.bulbagarden.net/media/upload/1/1a/Pokemon_Tower_RSE.png",
-  dragon: "https://archives.bulbagarden.net/media/upload/5/5f/Meteor_Falls_RSE.png",
-  ice: "https://archives.bulbagarden.net/media/upload/8/87/Shoal_Cave_Ice_RSE.png",
-  rock: "https://archives.bulbagarden.net/media/upload/3/3b/Route_111_Desert_RSE.png",
-  ground: "https://archives.bulbagarden.net/media/upload/3/3b/Route_111_Desert_RSE.png",
-  psychic: "https://archives.bulbagarden.net/media/upload/2/23/Mossdeep_City_RSE.png",
-  bug: "https://archives.bulbagarden.net/media/upload/9/9e/Petalburg_Woods_RSE.png",
-  fairy: "https://archives.bulbagarden.net/media/upload/7/7d/Route_120_RSE.png",
-  fighting: "https://archives.bulbagarden.net/media/upload/5/5f/Meteor_Falls_RSE.png",
-  poison: "https://archives.bulbagarden.net/media/upload/6/63/Fiery_Path_RSE.png",
-  normal: "https://archives.bulbagarden.net/media/upload/7/7d/Route_101_RSE.png"
+  grass: "https://archives.bulbagarden.net/media/upload/2/2e/Hoenn_Safari_Zone_RSE.png",
+  fire: "https://archives.bulbagarden.net/media/upload/1/1f/Mt_Chimney_RSE.png",
+  water: "https://archives.bulbagarden.net/media/upload/5/5c/Route_134_RSE.png",
+  electric: "https://archives.bulbagarden.net/media/upload/4/47/New_Mauville_RSE.png",
+  ghost: "https://archives.bulbagarden.net/media/upload/3/3c/Pokemon_Tower_RSE.png",
+  dragon: "https://archives.bulbagarden.net/media/upload/6/6c/Meteor_Falls_RSE.png",
+  ice: "https://archives.bulbagarden.net/media/upload/0/0c/Shoal_Cave_Ice_RSE.png",
+  rock: "https://archives.bulbagarden.net/media/upload/8/8c/Route_111_Desert_RSE.png",
+  ground: "https://archives.bulbagarden.net/media/upload/8/8c/Route_111_Desert_RSE.png",
+  psychic: "https://archives.bulbagarden.net/media/upload/0/0a/Mossdeep_City_RSE.png",
+  bug: "https://archives.bulbagarden.net/media/upload/4/4c/Petalburg_Woods_RSE.png",
+  fairy: "https://archives.bulbagarden.net/media/upload/6/6e/Route_120_RSE.png",
+  fighting: "https://archives.bulbagarden.net/media/upload/6/6c/Meteor_Falls_RSE.png",
+  poison: "https://archives.bulbagarden.net/media/upload/9/9c/Fiery_Path_RSE.png",
+  normal: "https://archives.bulbagarden.net/media/upload/1/1e/Route_101_RSE.png"
 };
+
 
 function setBiome(types) {
   const mainType = types[0].type.name;
