@@ -38,6 +38,7 @@ async function loadGen(gen) {
 function showPokemon(pokemon) {
   nameTitle.textContent = pokemon.name.toUpperCase();
   spriteImg.src = pokemon.sprites.front_default;
+  setBiome(pokemon.types);
 
   const stats = pokemon.stats.map(s => s.base_stat);
   const labels = ["HP", "ATQ", "DEF", "ATQ ESP", "DEF ESP", "VEL"];
@@ -72,6 +73,8 @@ function showPokemon(pokemon) {
     li.textContent = move.move.name;
     attackList.appendChild(li);
   });
+const cry = new Audio(pokemon.cries.latest);
+cry.play();
 }
 
 genSelect.addEventListener("change", () => loadGen(genSelect.value));
@@ -84,3 +87,30 @@ searchInput.addEventListener("input", () => {
 });
 
 loadGen(1);
+const detail = document.getElementById("detail");
+
+// Fondos pixel por tipo (biomas)
+const biomeBackgrounds = {
+  fire: "https://i.imgur.com/6L6bKqN.gif",      // volcán pixel
+  water: "https://i.imgur.com/7a8H3Zx.gif",     // océano pixel
+  grass: "https://i.imgur.com/qz7JQ6G.gif",     // bosque pixel
+  electric: "https://i.imgur.com/yvQZb0s.gif",  // central eléctrica pixel
+  rock: "https://i.imgur.com/2s9ZyO0.gif",      // desierto pixel
+  ground: "https://i.imgur.com/2s9ZyO0.gif",
+  ice: "https://i.imgur.com/vcC5F7F.gif",       // glaciar pixel
+  ghost: "https://i.imgur.com/LzJ0Y5C.gif",     // torre oscura pixel
+  dragon: "https://i.imgur.com/0H8Qp2b.gif",
+  normal: "https://i.imgur.com/9m7fK0L.gif",
+  psychic: "https://i.imgur.com/4S4xk8f.gif",
+  bug: "https://i.imgur.com/qz7JQ6G.gif",
+  fairy: "https://i.imgur.com/VFZgG6o.gif",
+  fighting: "https://i.imgur.com/2s9ZyO0.gif",
+  poison: "https://i.imgur.com/4S4xk8f.gif"
+};
+
+function setBiome(types) {
+  const mainType = types[0].type.name;
+  const bg = biomeBackgrounds[mainType] || biomeBackgrounds.normal;
+  detail.style.backgroundImage = `url(${bg})`;
+}
+
